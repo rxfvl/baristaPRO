@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: barista_user
+      POSTGRES_PASSWORD: barista_password
+      POSTGRES_DB: baristadb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./backend
+    restart: always
+    environment:
+      - POSTGRES_USER=barista_user
+      - POSTGRES_PASSWORD=barista_password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=baristadb
+      - JWT_SECRET_KEY=production_secret_key_change_me
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
